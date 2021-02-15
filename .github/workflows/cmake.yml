@@ -13,17 +13,18 @@ jobs:
           lfs: true
           submodules: recursive
     - uses: actions/setup-python@v2.2.1 # Get Python3
-    - uses: egor-tensin/setup-clang@v1  # Get Clang
-      if: startsWith(runner.os, 'macos') != true
     - uses: lukka/get-cmake@v3.19.2     # Get CMake and Ninja
       
     - name: Configure
+      working-directory: ${{github.workspace}}
       run: utils\hct\hctstart ${{github.workspace}} ${{github.workspace}}/build
       
     - name: Build Release
+      working-directory: ${{github.workspace}}
       run: utils\hct\hctbuild.cmd -x64 -release -vs2019 -spirvtest
       
     - name: Test Release
+      working-directory: ${{github.workspace}}
       run: utils\hct\hcttest -rel
       
   # Unix platforms use cmake
