@@ -3,17 +3,39 @@ name: CMake
 on: [push]
 
 jobs:
-  build:
+  # Windows build uses hctbuild
+  build_windows:
+    name: "Windows"
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          lfs: true
+          submodules: recursive
+    - uses: actions/setup-python@v2.2.1 # Get Python3
+    - uses: egor-tensin/setup-clang@v1  # Get Clang
+      if: startsWith(runner.os, 'macos') != true
+    - uses: lukka/get-cmake@v3.19.2     # Get CMake and Ninja
+      
+    - name: Configure
+      run: call utils\hct\hctstart ${{github.workspace}} ${{github.workspace}}/build
+      
+    - name: Build Release
+      run: call utils\hct\hctbuild.cmd -x64 -release -vs2019 -spirvtest
+      
+    - name: Test Release
+      run: call utils\hct\hcttest -rel
+      
+  # Unix platforms use cmake
+  build_unix:
     strategy:
       fail-fast: false
       matrix:
         config:
           - name: "Linux"
             os: ubuntu-latest
-            cmake: '-G "Ninja Multi-Config" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
           - name: "Mac"
             os: macos-latest
-            cmake: '-G "Ninja Multi-Config" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
 
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
@@ -28,10 +50,11 @@ jobs:
       if: startsWith(runner.os, 'macos') != true
     - uses: lukka/get-cmake@v3.19.2     # Get CMake and Ninja
       
-    - name: Configure CMake
+    
+    - name: Configure
       shell: bash
       working-directory: ${{github.workspace}}
-      run: cmake -B build ${{matrix.config.cmake}} -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dxc $(cat ${{github.workspace}}/utils/cmake-predefined-config-params)
+      run: cmake -B build -G "Ninja Multi-Config" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_INSTALL_PREFIX=${{github.workspace}}/dxc -DSPIRV_BUILD_TESTS=ON $(cat ${{github.workspace}}/utils/cmake-predefined-config-params)
       
     - name: Build Release
       working-directory: ${{github.workspace}}
@@ -42,6 +65,11 @@ jobs:
       working-directory: ${{github.workspace}}
       shell: bash
       run: cmake --build build --config Release
+      
+    - name: Test Release
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: ctest --build build --config Release
       
   # - name: Package Release
   # - name: Upload Release
