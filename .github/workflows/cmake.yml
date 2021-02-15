@@ -34,12 +34,16 @@ jobs:
       working-directory: ${{github.workspace}}
       shell: bash
       run: cmake -E tar "cfv" "dxc-Windows-${{github.run_number}}.7z" --format=7zip ./build/Release
-      
+
     - name: Upload Release
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       with:
-        path: ${{github.workspace}}/dxc-Windows-${{github.run_number}}.7z
-        name: dxc-Windows-${{github.run_number}}.7z
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{github.workspace}}/dxc-Windows-${{github.run_number}}.7z
+        asset_name: dxc-Windows-${{github.run_number}}.7z
+        asset_content_type: application/x-7z-compressed
       
   # Unix platforms use cmake
   build_unix:
@@ -91,8 +95,12 @@ jobs:
       run: cmake -E tar "cfv" "dxc-${{matrix.config.name}}-${{github.run_number}}.7z" --format=7zip ${{github.workspace}}/dxc
       
     - name: Upload Release
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       with:
-        path: ${{github.workspace}}/dxc-${{matrix.config.name}}-${{github.run_number}}.7z
-        name: dxc-${{matrix.config.name}}-${{github.run_number}}.7z
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{github.workspace}}/dxc-${{matrix.config.name}}-${{github.run_number}}.7z
+        asset_name: dxc-${{matrix.config.name}}-${{github.run_number}}.7z
+        asset_content_type: application/x-7z-compressed
        
