@@ -21,7 +21,7 @@ jobs:
       
     - name: Build Release
       working-directory: ${{github.workspace}}
-      run: utils\hct\hctbuild.cmd -x64 -release -vs2019 -spirvtest
+      run: utils\hct\hctbuild -x64 -release -vs2019 -spirvtest ${{github.workspace}} ${{github.workspace}}/build
       
     - name: Test Release
       working-directory: ${{github.workspace}}
