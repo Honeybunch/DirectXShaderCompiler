@@ -18,13 +18,13 @@ jobs:
     - uses: lukka/get-cmake@v3.19.2     # Get CMake and Ninja
       
     - name: Configure
-      run: call utils\hct\hctstart ${{github.workspace}} ${{github.workspace}}/build
+      run: utils\hct\hctstart ${{github.workspace}} ${{github.workspace}}/build
       
     - name: Build Release
-      run: call utils\hct\hctbuild.cmd -x64 -release -vs2019 -spirvtest
+      run: utils\hct\hctbuild.cmd -x64 -release -vs2019 -spirvtest
       
     - name: Test Release
-      run: call utils\hct\hcttest -rel
+      run: utils\hct\hcttest -rel
       
   # Unix platforms use cmake
   build_unix:
