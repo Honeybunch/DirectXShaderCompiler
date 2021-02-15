@@ -7,6 +7,9 @@ jobs:
   build_windows:
     name: "Windows"
     runs-on: windows-latest
+    env:
+        HLSL_SRC_DIR: ${{github.workspace}}
+        HLSL_BLD_DIR: ${{github.workspace}}\build
     steps:
     - uses: actions/checkout@v2
       with:
@@ -14,10 +17,6 @@ jobs:
           submodules: recursive
     - uses: actions/setup-python@v2.2.1 # Get Python3
     - uses: lukka/get-cmake@v3.19.2     # Get CMake and Ninja
-      
-      env:
-        HLSL_SRC_DIR: ${{github.workspace}}
-        HLSL_BLD_DIR: ${{github.workspace}}\build
       
     - name: Configure
       working-directory: ${{github.workspace}}
