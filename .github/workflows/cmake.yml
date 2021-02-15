@@ -26,9 +26,23 @@ jobs:
       working-directory: ${{github.workspace}}
       run: utils\hct\hctbuild -x64 -release -vs2019 -spirvtest
       
-    - name: Test Release
+    #- name: Test Release
+    #  working-directory: ${{github.workspace}}
+    #  run: utils\hct\hcttest -rel
+    
+    # - name: Package Release
+    # - name: Upload Release
+    
+    - name: Package Release
       working-directory: ${{github.workspace}}
-      run: utils\hct\hcttest -rel
+      shell: bash
+      run: cmake -E tar "cfv" "dxc-${{matrix.config.name}}-${{github.run_number}}.7z" --format=7zip ${{github.workspace}}/build/Release
+      
+    - name: Upload Release
+      uses: actions/upload-artifact@v1
+      with:
+        path: ${{github.workspace}}/dxc-${{matrix.config.name}}-${{github.run_number}}.7z
+        name: dxc-${{matrix.config.name}}-${{github.run_number}}.7z
       
   # Unix platforms use cmake
   build_unix:
@@ -75,6 +89,14 @@ jobs:
       shell: bash
       run: ctest --build build --config Release
       
-  # - name: Package Release
-  # - name: Upload Release
+    - name: Package Release
+      working-directory: ${{github.workspace}}
+      shell: bash
+      run: cmake -E tar "cfv" "dxc-${{matrix.config.name}}-${{github.run_number}}.7z" --format=7zip ${{github.workspace}}/dxc
+      
+    - name: Upload Release
+      uses: actions/upload-artifact@v1
+      with:
+        path: ${{github.workspace}}/dxc-${{matrix.config.name}}-${{github.run_number}}.7z
+        name: dxc-${{matrix.config.name}}-${{github.run_number}}.7z
        
