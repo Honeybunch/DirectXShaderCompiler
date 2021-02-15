@@ -3,6 +3,7 @@ name: CMake
 on: [push]
 
 jobs:
+
   # Windows build uses hctbuild
   build_windows:
     name: "Windows"
@@ -34,6 +35,18 @@ jobs:
       working-directory: ${{github.workspace}}
       shell: bash
       run: cmake -E tar "cfv" "dxc-Windows-${{github.run_number}}.7z" --format=7zip ./build/Release
+      
+    - name: Create Github Release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: dxc-${{github.run_number}}
+        tag_name: ${{ github.ref }}
+        body_path: CHANGELOG.md
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
 
     - name: Upload Release
       uses: actions/upload-release-asset@v1
@@ -93,6 +106,18 @@ jobs:
       working-directory: ${{github.workspace}}
       shell: bash
       run: cmake -E tar "cfv" "dxc-${{matrix.config.name}}-${{github.run_number}}.7z" --format=7zip ${{github.workspace}}/dxc
+      
+    - name: Create Github release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: dxc-${{github.run_number}}
+        tag_name: ${{ github.ref }}
+        body_path: CHANGELOG.md
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       
     - name: Upload Release
       uses: actions/upload-release-asset@v1
