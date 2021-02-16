@@ -27,6 +27,7 @@ jobs:
   build_windows:
     name: "Windows"
     runs-on: windows-latest
+    needs: create_release
     env:
         HLSL_SRC_DIR: ${{github.workspace}}
         HLSL_BLD_DIR: ${{github.workspace}}\build
@@ -78,6 +79,7 @@ jobs:
 
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
+    needs: create_release
 
     steps:
     - uses: actions/checkout@v2
