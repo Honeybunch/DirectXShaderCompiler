@@ -3,6 +3,26 @@ name: CMake
 on: [push]
 
 jobs:
+  
+  # Create Github Release
+  create_release:
+    name : "Create Release"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Github Release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: true
+        prerelease: false
+        release_name: dxc-${{github.run_number}}
+        tag_name: ${{ github.ref }}
+        body_path: CHANGELOG.md
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+
 
   # Windows build uses hctbuild
   build_windows:
@@ -36,24 +56,12 @@ jobs:
       shell: bash
       run: cmake -E tar "cfv" "dxc-Windows-${{github.run_number}}.7z" --format=7zip ./build/Release
       
-    - name: Create Github Release
-      uses: actions/create-release@v1
-      id: create_release
-      with:
-        draft: false
-        prerelease: false
-        release_name: dxc-${{github.run_number}}
-        tag_name: ${{ github.ref }}
-        body_path: CHANGELOG.md
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-
     - name: Upload Release
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        upload_url: ${{needs.create_release.outputs.upload_url}}
         asset_path: ${{github.workspace}}/dxc-Windows-${{github.run_number}}.7z
         asset_name: dxc-Windows-${{github.run_number}}.7z
         asset_content_type: application/x-7z-compressed
@@ -124,7 +132,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        upload_url: ${{needs.create_release.outputs.upload_url}}
         asset_path: ${{github.workspace}}/dxc-${{matrix.config.name}}-${{github.run_number}}.7z
         asset_name: dxc-${{matrix.config.name}}-${{github.run_number}}.7z
         asset_content_type: application/x-7z-compressed
