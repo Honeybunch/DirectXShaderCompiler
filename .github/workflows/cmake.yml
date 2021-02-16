@@ -17,6 +17,8 @@ jobs:
         prerelease: false
         release_name: dxc-${{github.run_number}}
         tag_name: ${{ github.ref }}
+        body: |
+          No Changelog Provided
       env:
         GITHUB_TOKEN: ${{ github.token }}
     outputs:
